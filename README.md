@@ -1,7 +1,7 @@
 # Тест: подбор климата по здоровью
 
 ## Автор
-Агата
+inst: satan.ixa
 
 ## Лицензия
 Этот проект распространяется под лицензией **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
