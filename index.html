@@ -343,6 +343,21 @@ function resetBackground() {
 
 showStartPage();
 </script>
+<!-- Комментарии Waline -->
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
+<div id="waline" style="margin-top: 40px;"></div>
+<script type="module">
+  import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+  
+  init({
+    el: '#waline',
+    serverURL: 'https://climate-comments-server.vercel.app',
+    lang: 'ru',
+    login: 'disable',
+    meta: ['nick'],
+    requiredMeta: []
+  });
+</script>
 <footer style="margin-top: 40px; padding: 15px; font-size: 12px; border-top: 1px solid #ccc;">
     <p>© 2025, inst: satan.ixa. Этот тест доступен по лицензии 
     <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">
