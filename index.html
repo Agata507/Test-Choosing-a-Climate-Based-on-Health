@@ -149,6 +149,7 @@ button:active {
         padding: 8px 12px;
     }
 }
+
     </style>
 
 </head>
@@ -346,17 +347,94 @@ showStartPage();
 <!-- Комментарии Waline -->
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
 <div id="waline" style="margin-top: 40px;"></div>
+
 <script type="module">
-  import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
-  
-  init({
-    el: '#waline',
-    serverURL: 'https://climate-comments-server.vercel.app',
-    lang: 'ru',
-    login: 'disable',
-    meta: ['nick'],
-    requiredMeta: []
+import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+
+// 1. Инициализация (исправленное время)
+init({
+  el: '#waline',
+  serverURL: 'https://climate-comments-server.vercel.app',
+  lang: 'ru',
+  login: 'disable',
+  meta: ['nick'],
+  requiredMeta: [],
+  locale: {
+    minutes: 'мин. назад',
+    hours: 'ч. назад',
+    days: 'дн. назад',
+    now: 'только что'
+  }
+});
+
+// 2. Функция для внедрения стилей
+function injectWalineStyle(root, css) {
+  if (!root.querySelector('style[data-custom-style]')) {
+    const style = document.createElement('style');
+    style.setAttribute('data-custom-style', 'true');
+    style.textContent = css;
+    root.appendChild(style);
+  }
+  root.querySelectorAll('*').forEach(el => {
+    if (el.shadowRoot) injectWalineStyle(el.shadowRoot, css);
   });
+}
+
+// 3. Стили (ТОЛЬКО ЦВЕТА ТЕКСТА, без кнопок)
+const walineTextCSS = `
+  /* Заголовок "Комментарии" - зелёный */
+  .wl-header, .wl-comment-count, h3 {
+    color: #007D34 !important;
+    font-family: 'Segoe Script', Arial, sans-serif !important;
+  }
+  
+  /* ВСЕ элементы сортировки (контейнер и его потомки) - ЧЁРНЫЕ по умолчанию */
+  .wl-sort, .wl-sort * {
+    color: #000000 !important;
+    font-family: 'Segoe Script', Arial, sans-serif !important;
+    transition: color 0.3s ease !important;
+  }
+  
+  /* АКТИВНЫЙ (выбранный) элемент сортировки - ЗЕЛЁНЫЙ */
+  .wl-sort .active, .wl-sort-item.active {
+    color: #007D34 !important;
+    font-weight: bold !important;
+  }
+
+  /* Надпись "Powered by Waline" - ЧЁРНАЯ */
+  .wl-power, .wl-power a {
+    color: #000000 !important;
+    font-family: 'Segoe Script', Arial, sans-serif !important;
+  }
+`;
+
+// 4. Скрываем кнопку "Обновить"
+setTimeout(() => {
+  const walineEl = document.querySelector('#waline');
+  if (!walineEl) return;
+
+  const findAndHide = (root) => {
+    const buttons = root.querySelectorAll('button, a, span');
+    buttons.forEach(btn => {
+      const txt = btn.textContent.trim().toLowerCase();
+      if (txt === 'обновить' || txt === 'refresh') {
+        btn.style.display = 'none';
+      }
+    });
+    root.querySelectorAll('*').forEach(el => {
+      if (el.shadowRoot) findAndHide(el.shadowRoot);
+    });
+  };
+
+  findAndHide(walineEl);
+  injectWalineStyle(walineEl, walineTextCSS);
+
+  const observer = new MutationObserver(() => {
+    findAndHide(walineEl);
+    injectWalineStyle(walineEl, walineTextCSS);
+  });
+  observer.observe(walineEl, { childList: true, subtree: true });
+}, 1500);
 </script>
 <footer style="margin-top: 40px; padding: 15px; font-size: 12px; border-top: 1px solid #ccc;">
     <p>© 2025, inst: satan.ixa. Этот тест доступен по лицензии 
